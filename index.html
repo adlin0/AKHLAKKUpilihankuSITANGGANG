@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Akhlakku Pilihanku - Kisah Si Tanggang</title>
+  <!-- Library Canvas Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #fef3c7;
+      --good-color: #16a34a;
+      --bad-color: #dc2626;
+    }
+
+    body {
+      font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif;
+      background-color: var(--bg-color);
+      text-align: center;
+      margin: 0;
+      padding: 15px;
+      user-select: none;
+      -webkit-user-select: none;
+      overflow-x: hidden;
+    }
+
+    .mascot-img {
+      width: 140px;
+      height: auto;
+      border-radius: 15px;
+      margin-bottom: 15px;
+      filter: drop-shadow(0 6px 12px rgba(0,0,0,0.18));
+    }
+
+    .mascot-small {
+      width: 60px;
+      height: auto;
+      vertical-align: middle;
+      margin-right: 10px;
+    }
+
+    .start-screen, .guide-modal {
+      background: #ffffff;
+      padding: 35px 25px;
+      border-radius: 25px;
+      max-width: 600px;
+      margin: 25px auto;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+      border: 5px solid #f59e0b;
+    }
+
+    .start-screen h1 {
+      font-size: 2.3rem;
+      color: #92400e;
+      margin: 10px 0 5px 0;
+    }
+
+    .start-screen-subtitle {
+      font-size: 1.2rem;
+      color: #78350f;
+      font-weight: 500;
+      margin-bottom: 10px;
+    }
+
+    .input-label {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #451a03;
+      display: inline-block;
+      margin-top: 10px;
+    }
+
+    .input-name {
+      width: 85%;
+      padding: 16px;
+      font-size: 1.3rem;
+      border: 3px solid #f59e0b;
+      border-radius: 15px;
+      margin: 20px 0 25px 0;
+      text-align: center;
+      outline: none;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+      font-family: inherit;
+    }
+
+    .input-name:focus {
+      border-color: #d97706;
+      background-color: #fffbeb;
+    }
+
+    .btn-main {
+      padding: 15px 30px;
+      font-size: 1.25rem;
+      background: #22c55e;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 5px 0 #15803d;
+      margin: 8px;
+      transition: transform 0.1s ease;
+    }
+
+    .btn-main:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #15803d;
+    }
+
+    .btn-guide {
+      background: #0284c7;
+      box-shadow: 0 5px 0 #0369a1;
+    }
+
+    .sound-btn {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: #ffffff;
+      border: 3px solid #f59e0b;
+      font-size: 1.5rem;
+      padding: 8px 12px;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      z-index: 100;
+    }
+
+    .header-panel {
+      max-width: 600px;
+      margin: 0 auto 15px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #ffffff;
+      padding: 10px 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+
+    .player-info {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #92400e;
+      display: flex;
+      align-items: center;
+    }
+
+    .score-box {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #b45309;
+    }
+
+    .progress-bar-container {
+      width: 30%;
+      background-color: #e5e7eb;
+      height: 16px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background-color: var(--good-color);
+      transition: width 0.3s ease;
+    }
+
+    .subtitle {
+      color: #78350f;
+      font-size: 1rem;
+      margin-bottom: 20px;
+    }
+
+    .card-area {
+      min-height: 140px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 25px;
+    }
+
+    .draggable-card {
+      background: linear-gradient(135deg, #ffffff, #fef08a);
+      border: 4px solid #f59e0b;
+      border-radius: 20px;
+      padding: 20px 25px;
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: #451a03;
+      box-shadow: 0 8px 15px rgba(245, 158, 11, 0.3);
+      max-width: 480px;
+      cursor: grab;
+      touch-action: none;
+      transition: transform 0.1s ease, opacity 0.2s ease;
+    }
+
+    .draggable-card:active {
+      cursor: grabbing;
+      opacity: 0.9;
+    }
+
+    .baskets-container {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      max-width: 650px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+    }
+
+    .basket {
+      background: #ffffff;
+      border: 4px dashed #22c55e;
+      border-radius: 25px;
+      padding: 15px;
+      width: 200px;
+      min-height: 150px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+    }
+
+    .basket.bad-basket {
+      border-color: #ef4444;
+    }
+
+    .basket.drag-over {
+      transform: scale(1.08);
+      background-color: #dcfce7;
+      border-style: solid;
+    }
+
+    .basket.bad-basket.drag-over {
+      background-color: #fee2e2;
+    }
+
+    .basket-icon {
+      font-size: 3.5rem;
+      pointer-events: none;
+    }
+
+    .basket-title {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #15803d;
+      margin-top: 8px;
+      pointer-events: none;
+    }
+
+    .bad-basket .basket-title {
+      color: #b91c1c;
+    }
+
+    #feedback {
+      margin-top: 20px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      min-height: 40px;
+    }
+
+    .bonus-screen {
+      display: none;
+      background: #1e293b;
+      color: white;
+      padding: 20px;
+      border-radius: 20px;
+      max-width: 550px;
+      margin: 10px auto;
+      position: relative;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    }
+
+    .storm-area {
+      height: 220px;
+      background: #0f172a;
+      border-radius: 15px;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid #38bdf8;
+      margin: 15px 0;
+    }
+
+    .cloud-target {
+      font-size: 3.5rem;
+      position: absolute;
+      cursor: pointer;
+      animation: float 2s infinite ease-in-out alternate;
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-10px); }
+    }
+
+    .win-screen {
+      display: none;
+      background: #ffffff;
+      padding: 25px 20px;
+      border-radius: 20px;
+      max-width: 580px;
+      margin: 20px auto;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      border: 4px solid #22c55e;
+    }
+
+    .badge-box {
+      font-size: 3.5rem;
+      margin: 5px 0;
+    }
+
+    .stars-display {
+      font-size: 2rem;
+      color: #f59e0b;
+      margin: 5px 0;
+    }
+
+    .badge-name {
+      font-size: 1.3rem;
+      font-weight: bold;
+      color: #b45309;
+      margin-bottom: 10px;
+    }
+
+    .feedback-box {
+      background: #fef3c7;
+      border: 2px dashed #f59e0b;
+      border-radius: 15px;
+      padding: 12px 15px;
+      font-size: 1.05rem;
+      color: #451a03;
+      margin: 15px 0;
+      line-height: 1.4;
+      text-align: left;
+    }
+
+    /* Gaya Jadual Semakan Jawapan Akhir */
+    .review-box {
+      background: #f8fafc;
+      border: 2px solid #cbd5e1;
+      border-radius: 15px;
+      padding: 15px;
+      margin: 15px 0 20px 0;
+      text-align: left;
+      max-height: 250px;
+      overflow-y: auto;
+    }
+
+    .review-item {
+      padding: 8px 10px;
+      border-bottom: 1px solid #e2e8f0;
+      font-size: 0.95rem;
+    }
+
+    .review-item:last-child {
+      border-bottom: none;
+    }
+
+    .review-item.wrong {
+      background: #fef2f2;
+      border-radius: 8px;
+    }
+
+    .review-item.correct {
+      background: #f0fdf4;
+      border-radius: 8px;
+    }
+
+    .guide-box {
+      text-align: left;
+      line-height: 1.6;
+      font-size: 1.1rem;
+      color: #334155;
+    }
+
+    .btn-restart {
+      padding: 12px 25px;
+      font-size: 1.1rem;
+      background: #22c55e;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      box-shadow: 0 4px 0 #15803d;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Butang Kawalan Audio -->
+  <button class="sound-btn" id="soundToggleBtn" onclick="toggleAudio()">🔊</button>
+
+  <!-- 1. SKRIN MULA -->
+  <div class="start-screen" id="startScreen">
+    <!-- Pautan Direct Link Google Drive yang Diperbaiki -->
+    <img src="gambar-budi.jpeg" alt="Maskot Utama" class="mascot-img">
+    <h1>⛵ Akhlakku Pilihanku</h1>
+    <div class="start-screen-subtitle">Mari kenali akhlak baik dan buruk daripada Kisah Si Tanggang!</div>
+    <hr style="border: 0; border-top: 2px solid #fde68a; margin: 20px 0;">
+    
+    <label for="playerName" class="input-label">Sila Masukkan Nama Anda:</label><br>
+    <input type="text" id="playerName" class="input-name" placeholder="Contoh: Ahmad " maxlength="20">
+    <br>
+    <button class="btn-main" onclick="startGame()">Mula Bermain ▶️</button>
+    <button class="btn-main btn-guide" onclick="showGuide()">Panduan 📖</button>
+  </div>
+
+  <!-- 2. SKRIN PANDUAN -->
+  <div class="start-screen" id="guideScreen" style="display: none;">
+   <img src="gambar-budi.jpeg" alt="Maskot Utama" class="mascot-img" style="width: 90px;">
+    <h2>📖 Cara Bermain</h2>
+    <div class="guide-box">
+      <ul>
+        <li><strong>1. Fahami Situasi:</strong> Baca pernyataan pada kad di paparan skrin.</li>
+        <li><strong>2. Seret Kad (Drag):</strong> Seret kad ke bakul <strong>Akhlak Baik 🧺</strong> atau <strong>Akhlak Buruk 🗑️</strong>.</li>
+        <li><strong>3. Semak Jawapan:</strong> Semak soalan yang salah dan jawapan di akhir permainan serta ketahui skor anda.</li>
+      </ul>
+    </div>
+    <button class="btn-main" onclick="hideGuide()">Faham, Kembali ↩️</button>
+  </div>
+
+  <!-- 3. PAPAN PERMAINAN UTAMA -->
+  <div id="gamePlay" style="display: none;">
+    <div class="header-panel">
+      <div class="player-info">
+        <img src="gambar-budi.jpeg" alt="Maskot" class="mascot-small">
+        <span id="displayPlayerName">Murid</span>
+      </div>
+      <div class="score-box">⭐ Mata: <span id="score">0</span></div>
+      <div class="progress-bar-container">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <h1 style="color: #92400e; margin: 5px 0; font-size: 1.8rem;">⛵ Akhlakku Pilihanku</h1>
+    <div class="subtitle">👉 Baca pernyataan dan heret kad ke bakul yang betul!</div>
+
+    <div class="card-area">
+      <div class="draggable-card" id="draggableCard" draggable="true">
+        Memuatkan situasi...
+      </div>
+    </div>
+
+    <div class="baskets-container">
+      <div class="basket" id="basketGood" data-category="baik">
+        <div class="basket-icon">🧺</div>
+        <div class="basket-title">Akhlak Baik</div>
+      </div>
+
+      <div class="basket bad-basket" id="basketBad" data-category="buruk">
+        <div class="basket-icon">🗑️</div>
+        <div class="basket-title">Akhlak Buruk</div>
+      </div>
+    </div>
+
+    <div id="feedback"></div>
+  </div>
+
+  <!-- 4. MINI BONUS GAME -->
+  <div class="bonus-screen" id="bonusScreen">
+    <h2 style="color: #f59e0b; margin:0;">⚡ AMARAN: RIBUT DI LAUT! ⚡</h2>
+    <p>Kapal dilanda ribut! Tekan awan-awan ribut di bawah untuk hilangkan ribut!</p>
+    <div>⏱️ Masa: <span id="bonusTimer" style="font-weight:bold; color:#ef4444;">10</span>s | ☁️ Awan Ditekan: <span id="cloudCount" style="font-weight:bold; color:#38bdf8;">0</span>/5</div>
+    
+    <div class="storm-area" id="stormArea"></div>
+  </div>
+
+  <!-- 5. SKRIN KEMENANGAN & ANALISIS JAWAPAN -->
+  <div class="win-screen" id="winScreen">
+    <img src="gambar-budi.jpeg" alt="Maskot Utama" class="mascot-img">
+    <h2>🎉 KEPUTUSAN, <span id="winPlayerName" style="color:#b45309;">MURID</span>! 🎉</h2>
+    
+    <div class="stars-display" id="starsDisplay">⭐⭐⭐</div>
+    <div class="badge-box" id="badgeIcon">🛡️</div>
+    <div class="badge-name" id="badgeName">Lencana Anak Taat</div>
+
+    <h3 style="color: #b45309; font-size: 1.4rem; margin: 5px 0;">Jumlah Mata: <span id="finalScore">0</span> / 100</h3>
+    
+    <!-- Kotak Ulasan Berdasarkan Skor -->
+    <div class="feedback-box">
+      <strong>💬 Ulasan Guru:</strong><br>
+      <span id="finalFeedback"></span>
+    </div>
+
+    <!-- Kotak Semakan Jawapan (Wrong Questions Review) -->
+    <div class="review-box">
+      <strong style="color: #1e293b; font-size: 1.05rem;">📝 Analisis Semakan Jawapan:</strong>
+      <div id="reviewList" style="margin-top: 8px;"></div>
+    </div>
+    
+    <button class="btn-restart" onclick="restartGame()">Main Semula 🔄</button>
+  </div>
+
+  <script>
+    /* ========================================================
+       FUNGSI GOOGLE SHEETS INTEGRATION (DIPERBAIKI)
+       ======================================================== */
+    function hantarKeputusanGame(namaMurid, skorMurid, ulasanGame) {
+      var scriptURL = "https://script.google.com/macros/s/AKfycbz2s7j4Sm1fgFBzlNHlwYZ6S37eXfaO28aMrIKfzGbe_5c5K1Fkmm9I50xpvcmTWTCA2A/exec";
+
+      var dataGame = {
+        nama: namaMurid,
+        book: "SI TANGGANG",
+        game: 1,
+        skor: skorMurid,
+        ulasan: ulasanGame || ""
+      };
+
+      // Menggunakan text/plain & mode no-cors untuk melepasi sekatan CORS Google Apps Script
+      fetch(scriptURL, {
+        method: "POST",
+        mode: "no-cors",
+        headers: {
+          "Content-Type": "text/plain"
+        },
+        body: JSON.stringify(dataGame)
+      })
+      .then(function() {
+        console.log("Penghantaran data selesai.");
+      })
+      .catch(function(error) {
+        console.error("Ralat rangkaian/server:", error);
+      });
+    }
+
+    /* ========================================================
+       SISTEM AUDIO RANCAK & SYNTHESIZER
+       ======================================================== */
+    let audioCtx = null;
+    let isMuted = false;
+    let bgmInterval = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function toggleAudio() {
+      isMuted = !isMuted;
+      const btn = document.getElementById('soundToggleBtn');
+      if (isMuted) {
+        btn.innerText = '🔇';
+        stopBGM();
+      } else {
+        btn.innerText = '🔊';
+        startBGM();
+      }
+    }
+
+    const bgmMelody = [
+      { note: 523.25, bass: 261.63 },
+      { note: 659.25, bass: 329.63 },
+      { note: 783.99, bass: 392.00 },
+      { note: 1046.50, bass: 523.25 },
+      { note: 880.00, bass: 440.00 },
+      { note: 783.99, bass: 392.00 },
+      { note: 659.25, bass: 329.63 },
+      { note: 587.33, bass: 293.66 }
+    ]; 
+    let bgmNoteIndex = 0;
+
+    function startBGM() {
+      if (isMuted || bgmInterval) return;
+      bgmInterval = setInterval(() => {
+        if (isMuted || !audioCtx) return;
+        try {
+          const now = audioCtx.currentTime;
+          let oscLead = audioCtx.createOscillator();
+          let gainLead = audioCtx.createGain();
+          oscLead.type = 'square';
+          oscLead.frequency.setValueAtTime(bgmMelody[bgmNoteIndex].note, now);
+          gainLead.gain.setValueAtTime(0.025, now); 
+          gainLead.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+          oscLead.connect(gainLead);
+          gainLead.connect(audioCtx.destination);
+          oscLead.start(now);
+          oscLead.stop(now + 0.18);
+
+          let oscBass = audioCtx.createOscillator();
+          let gainBass = audioCtx.createGain();
+          oscBass.type = 'triangle';
+          oscBass.frequency.setValueAtTime(bgmMelody[bgmNoteIndex].bass, now);
+          gainBass.gain.setValueAtTime(0.04, now);
+          gainBass.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+          oscBass.connect(gainBass);
+          gainBass.connect(audioCtx.destination);
+          oscBass.start(now);
+          oscBass.stop(now + 0.2);
+
+          bgmNoteIndex = (bgmNoteIndex + 1) % bgmMelody.length;
+        } catch(e) {}
+      }, 220);
+    }
+
+    function stopBGM() {
+      if (bgmInterval) {
+        clearInterval(bgmInterval);
+        bgmInterval = null;
+      }
+    }
+
+    function playSFX(type) {
+      if (isMuted) return;
+      initAudio();
+
+      try {
+        if (type === 'good') {
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, idx) => {
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            let now = audioCtx.currentTime + (idx * 0.06);
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now);
+            gain.gain.setValueAtTime(0.2, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.2);
+          });
+        } else if (type === 'bad') {
+          let osc = audioCtx.createOscillator();
+          let gain = audioCtx.createGain();
+          let now = audioCtx.currentTime;
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(160, now);
+          osc.frequency.setValueAtTime(110, now + 0.12);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.3);
+        } else if (type === 'pop') {
+          let osc = audioCtx.createOscillator();
+          let gain = audioCtx.createGain();
+          let now = audioCtx.currentTime;
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(900, now);
+          osc.frequency.exponentialRampToValueAtTime(300, now + 0.08);
+          gain.gain.setValueAtTime(0.3, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.08);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.08);
+        } else if (type === 'win') {
+          const winNotes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+          winNotes.forEach((freq, idx) => {
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            let now = audioCtx.currentTime + (idx * 0.1);
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now);
+            gain.gain.setValueAtTime(0.25, now);
+            gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start(now);
+            osc.stop(now + 0.4);
+          });
+        }
+      } catch(e) {}
+    }
+
+    /* ========================================================
+       LOGIK PERMAINAN
+       ======================================================== */
+    const gameData = [
+      { text: "1. Si Tanggang mempunyai keinginan untuk mengubah nasib keluarganya yang miskin. ", category: "baik" },
+      { text: "2. Si Tanggang gigih bekerja di atas kapal sehingga dilantik menjadi Nakhoda 🚢.", category: "baik" },
+      { text: "3. Si Tanggang berpura-pura tidak mengenali ibu bapanya yang miskin👵.", category: "buruk" },
+      { text: "4. Mak Deruma bersusah-payah mendayung sampan hanya untuk menemui Si Tanggang yang sangat dirinduinya.", category: "baik" },
+      { text: "5. Si Tanggang berasa malu dengan isterinya apabila Mak Deruma dan Si Talang mengaku bahawa mereka ialah ibu bapa Si Tanggang.", category: "buruk" },
+      { text: "6. Si Tanggang bersikap sombong kerana mempunyai pangkat yang tinggi dan harta kekayaan yang banyak.", category: "buruk" },
+      { text: "7. Ibu Si Tanggang mendoakan agar Allah memberi petunjuk atas perbuatan anaknya 🤲.", category: "baik" },
+      { text: "8. Si Tanggang tidak menghormati ibu bapanya selepas dia bekerja dan meninggalkan mereka.", category: "buruk" },
+      { text: "9. Sentiasa menghormati dan tidak derhaka kepada ibu bapa yang telah membesarkan kita ❤️.", category: "baik" },
+      { text: "10. Sentiasa bersyukur dengan nikmat rezeki dan tidak sombong diri.", category: "baik" }
+    ];
+
+    let currentIndex = 0;
+    let score = 0;
+    let bonusPlayed = false;
+    let playerName = "Murid";
+    let userAnswers = []; // Rekod rekod jawapan murid
+
+    const card = document.getElementById('draggableCard');
+    const baskets = document.querySelectorAll('.basket');
+    const feedback = document.getElementById('feedback');
+
+    function showGuide() {
+      initAudio();
+      document.getElementById('startScreen').style.display = 'none';
+      document.getElementById('guideScreen').style.display = 'block';
+    }
+
+    function hideGuide() {
+      document.getElementById('guideScreen').style.display = 'none';
+      document.getElementById('startScreen').style.display = 'block';
+    }
+
+    function startGame() {
+      initAudio();
+      startBGM();
+
+      const input = document.getElementById('playerName').value.trim();
+      if (input !== "") {
+        playerName = input;
+      }
+      document.getElementById('displayPlayerName').innerText = playerName;
+      document.getElementById('startScreen').style.display = 'none';
+      document.getElementById('gamePlay').style.display = 'block';
+      loadCard();
+    }
+
+    function loadCard() {
+      if (currentIndex === 5 && !bonusPlayed) {
+        startBonusGame();
+        return;
+      }
+
+      if (currentIndex < gameData.length) {
+        card.innerText = gameData[currentIndex].text;
+        card.style.opacity = "1";
+        card.style.transform = "scale(1) translate(0px, 0px)";
+        feedback.innerText = "";
+        
+        const progressPercent = (currentIndex / gameData.length) * 100;
+        document.getElementById('progressFill').style.width = progressPercent + "%";
+      } else {
+        showWinScreen();
+      }
+    }
+
+    /* Drag & Drop Logic */
+    card.addEventListener('dragstart', (e) => {
+      e.dataTransfer.setData('text/plain', gameData[currentIndex].category);
+      card.style.opacity = "0.5";
+    });
+
+    card.addEventListener('dragend', () => card.style.opacity = "1");
+
+    baskets.forEach(basket => {
+      basket.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        basket.classList.add('drag-over');
+      });
+      basket.addEventListener('dragleave', () => basket.classList.remove('drag-over'));
+      basket.addEventListener('drop', (e) => {
+        e.preventDefault();
+        basket.classList.remove('drag-over');
+        checkAnswer(basket.dataset.category, basket);
+      });
+    });
+
+    let startX = 0, startY = 0;
+    card.addEventListener('touchstart', (e) => {
+      const touch = e.touches[0];
+      startX = touch.clientX;
+      startY = touch.clientY;
+      card.style.transition = "none";
+    }, { passive: true });
+
+    card.addEventListener('touchmove', (e) => {
+      const touch = e.touches[0];
+      card.style.transform = `translate(${touch.clientX - startX}px, ${touch.clientY - startY}px)`;
+    }, { passive: true });
+
+    card.addEventListener('touchend', (e) => {
+      card.style.transition = "all 0.2s ease";
+      const touch = e.changedTouches[0];
+      let droppedInBasket = false;
+
+      baskets.forEach(basket => {
+        const rect = basket.getBoundingClientRect();
+        if (touch.clientX >= rect.left && touch.clientX <= rect.right && touch.clientY >= rect.top && touch.clientY <= rect.bottom) {
+          droppedInBasket = true;
+          checkAnswer(basket.dataset.category, basket);
+        }
+      });
+
+      if (!droppedInBasket) card.style.transform = "translate(0px, 0px)";
+    });
+
+    function checkAnswer(chosenCategory, basketElement) {
+      const correctCategory = gameData[currentIndex].category;
+      const isCorrect = (chosenCategory === correctCategory);
+
+      userAnswers.push({
+        question: gameData[currentIndex].text,
+        userAns: chosenCategory,
+        correctAns: correctCategory,
+        isCorrect: isCorrect
+      });
+
+      if (isCorrect) {
+        playSFX('good');
+        score += 10;
+        document.getElementById('score').innerText = score;
+        feedback.innerHTML = "🎉 TEPAT!";
+        feedback.style.color = "#15803d";
+      } else {
+        playSFX('bad');
+        feedback.innerHTML = "❌ KURANG TEPAT!";
+        feedback.style.color = "#b91c1c";
+      }
+
+      card.style.opacity = "0";
+      card.style.transform = "scale(0.5)";
+      currentIndex++;
+      
+      setTimeout(loadCard, 400);
+    }
+
+    /* Bonus Game */
+    let cloudsPopped = 0;
+    let bonusTimerInterval;
+
+    function startBonusGame() {
+      document.getElementById('gamePlay').style.display = 'none';
+      document.getElementById('bonusScreen').style.display = 'block';
+      
+      const stormArea = document.getElementById('stormArea');
+      stormArea.innerHTML = '';
+      cloudsPopped = 0;
+      document.getElementById('cloudCount').innerText = cloudsPopped;
+
+      for (let i = 0; i < 5; i++) {
+        createCloud(stormArea);
+      }
+
+      let timeLeft = 10;
+      document.getElementById('bonusTimer').innerText = timeLeft;
+
+      bonusTimerInterval = setInterval(() => {
+        timeLeft--;
+        document.getElementById('bonusTimer').innerText = timeLeft;
+
+        if (timeLeft <= 0 || cloudsPopped >= 5) {
+          endBonusGame();
+        }
+      }, 1000);
+    }
+
+    function createCloud(container) {
+      const cloud = document.createElement('div');
+      cloud.className = 'cloud-target';
+      cloud.innerText = '🌩️';
+      cloud.style.top = Math.random() * 140 + 'px';
+      cloud.style.left = Math.random() * 80 + '%';
+
+      cloud.onclick = function() {
+        playSFX('pop');
+        cloud.remove();
+        cloudsPopped++;
+        document.getElementById('cloudCount').innerText = cloudsPopped;
+        if (cloudsPopped >= 5) {
+          endBonusGame();
+        }
+      };
+
+      container.appendChild(cloud);
+    }
+
+    function endBonusGame() {
+      clearInterval(bonusTimerInterval);
+      bonusPlayed = true;
+      document.getElementById('bonusScreen').style.display = 'none';
+      document.getElementById('gamePlay').style.display = 'block';
+      loadCard();
+    }
+
+    /* Win Screen & Hantar Keputusan ke Google Sheets */
+    function showWinScreen() {
+      stopBGM();
+      playSFX('win');
+
+      document.getElementById('gamePlay').style.display = 'none';
+      document.getElementById('winScreen').style.display = 'block';
+      document.getElementById('progressFill').style.width = '100%';
+      document.getElementById('winPlayerName').innerText = playerName;
+      document.getElementById('finalScore').innerText = score;
+
+      const stars = document.getElementById('starsDisplay');
+      const badgeIcon = document.getElementById('badgeIcon');
+      const badgeName = document.getElementById('badgeName');
+      const msg = document.getElementById('finalFeedback');
+
+      if (score >= 90) {
+        stars.innerText = '⭐⭐⭐⭐⭐';
+        badgeIcon.innerText = '👑';
+        badgeName.innerText = 'Lencana Anugerah Taat Ibu Bapa';
+        msg.innerText = `Luar biasa, ${playerName}! Anda seorang anak yang sangat taat dan menghormati ibu bapa. Jadilah teladan yang baik seperti dalam ajaran Islam!`;
+      } else if (score >= 70) {
+        stars.innerText = '⭐⭐⭐⭐';
+        badgeIcon.innerText = '🛡️';
+        badgeName.innerText = 'Lencana Anak Taat & Sopan';
+        msg.innerText = `Syabas, ${playerName}! Kefahaman anda tentang akhlak mulia sangat baik. Teruskan berbakti dan menyayangi ibu bapa anda!`;
+      } else if (score >= 50) {
+        stars.innerText = '⭐⭐⭐';
+        badgeIcon.innerText = '🏅';
+        badgeName.innerText = 'Lencana Anak Prihatin';
+        msg.innerText = `Bagus, ${playerName}! Anda dah faham asas akhlak yang baik. Teruskan belajar jangan menderhaka kepada ibu bapa.`;
+      } else if (score >= 30) {
+        stars.innerText = '⭐⭐';
+        badgeIcon.innerText = '🎗️';
+        badgeName.innerText = 'Lencana Tunas Budi';
+        msg.innerText = `Usaha yang baik, ${playerName}! Ada beberapa perkara yang perlu diperbaiki. Sentiasa ingat pengorbanan ibu bapa kita ya!`;
+      } else {
+        stars.innerText = '⭐';
+        badgeIcon.innerText = '📘';
+        badgeName.innerText = 'Lencana Pembimbing Akhlak';
+        msg.innerText = `Jangan putus asa, ${playerName}! Mari ulang semula permainan ini untuk lebih memahami perbezaan akhlak baik dan akhlak buruk.`;
+      }
+
+      // Paparkan Analisis Senarai Semakan Jawapan
+      const reviewList = document.getElementById('reviewList');
+      reviewList.innerHTML = '';
+
+      userAnswers.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = `review-item ${item.isCorrect ? 'correct' : 'wrong'}`;
+        
+        const statusIcon = item.isCorrect ? '✅' : '❌';
+        const correctLabel = item.correctAns === 'baik' ? 'Akhlak Baik 🧺' : 'Akhlak Buruk 🗑️';
+
+        if(item.isCorrect) {
+          div.innerHTML = `<strong>${statusIcon} Soalan ${idx+1}:</strong> ${item.question}<br><span style="color:#15803d; font-size:0.85rem;">Jawapan Anda Betul: <strong>${correctLabel}</strong></span>`;
+        } else {
+          div.innerHTML = `<strong>${statusIcon} Soalan ${idx+1}:</strong> ${item.question}<br><span style="color:#b91c1c; font-size:0.85rem;">Jawapan Betul: <strong>${correctLabel}</strong></span>`;
+        }
+        
+        reviewList.appendChild(div);
+      });
+
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      }
+
+      // HANTAR KEPUTUSAN AUTOMATIK KE GOOGLE SHEETS
+      hantarKeputusanGame(playerName, score, badgeName.innerText);
+    }
+
+    function restartGame() {
+      currentIndex = 0;
+      score = 0;
+      bonusPlayed = false;
+      userAnswers = [];
+      document.getElementById('score').innerText = score;
+      document.getElementById('startScreen').style.display = 'block';
+      document.getElementById('winScreen').style.display = 'none';
+      document.getElementById('bonusScreen').style.display = 'none';
+      document.getElementById('gamePlay').style.display = 'none';
+    }
+  </script>
+</body>
+</html>
